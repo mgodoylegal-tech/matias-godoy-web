@@ -21,6 +21,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://matiasgodoy.com.ar/primeros-pasos.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://matiasgodoy.com.ar/analisis.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
