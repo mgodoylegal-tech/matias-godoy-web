@@ -965,6 +965,27 @@ summary:focus-visible {
   .page-home #contacto .grid { gap: var(--sp-5); }
   .form--priority { box-shadow: 0 10px 26px -12px rgba(201, 161, 74, 0.45); }
   .form__lead h3 { font-size: var(--fs-md); }
+
+  .page-home .site-footer { padding: var(--sp-7) 0 var(--sp-5); }
+  .page-home .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+    margin-bottom: var(--sp-6);
+  }
+  .page-home .footer-grid > div:not(.footer__brand):not(:last-child) {
+    display: none;
+  }
+  .page-home .footer__brand p {
+    max-width: none !important;
+    margin-top: var(--sp-3) !important;
+  }
+  .page-home .footer-grid h4 { margin-bottom: var(--sp-3); }
+  .page-home .footer-grid ul { gap: var(--sp-3); }
+  .page-home .footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sp-2);
+  }
 }
 
 /* --- WhatsApp floating --- */
