@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!-- Fondo near-black con halo dorado sutil -->
+  <defs>
+    <radialGradient id="halo" cx="78%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#c9a14a" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#c9a14a" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#1c1a14" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#halo)"/>
+
+  <!-- Borde dorado sutil -->
+  <rect x="24" y="24" width="1152" height="582" rx="6" fill="none" stroke="#3a3429" stroke-width="1"/>
+
+  <!-- Eyebrow / mono -->
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace" font-size="22" fill="#c9a14a" letter-spacing="3">
+    <line x1="80" y1="120" x2="116" y2="120" stroke="#c9a14a" stroke-width="2"/>
+    <text x="130" y="128" font-weight="500">ABOGADO · LEGAL-TECH</text>
+  </g>
+
+  <!-- Headline serif -->
+  <g font-family="'Cormorant Garamond', Georgia, serif" fill="#f4efde">
+    <text x="80" y="230" font-size="64" font-weight="600">Dr. Matías Luciano Godoy</text>
+    <text x="80" y="330" font-size="44" font-weight="500" fill="#d2cab6">Fraude bancario digital</text>
+    <text x="80" y="385" font-size="44" font-weight="500" fill="#d2cab6">y reclamos contra entidades</text>
+    <text x="80" y="440" font-size="44" font-weight="500" fill="#d2cab6">financieras.</text>
+  </g>
+
+  <!-- Línea divisoria dorada -->
+  <line x1="80" y1="495" x2="220" y2="495" stroke="#c9a14a" stroke-width="2"/>
+
+  <!-- URL / footer -->
+  <g font-family="'Inter', -apple-system, sans-serif" fill="#8a8270">
+    <text x="80" y="535" font-size="22" font-weight="400">matiasgodoy.com.ar</text>
+  </g>
+
+  <!-- Monograma MG en esquina inferior derecha -->
+  <g transform="translate(1020, 470)">
+    <rect width="100" height="100" rx="8" fill="#15130f" stroke="#c9a14a" stroke-width="1"/>
+    <text x="50" y="68" text-anchor="middle"
+          font-family="'Cormorant Garamond', Georgia, serif"
+          font-weight="600" font-size="48" fill="#c9a14a"
+          letter-spacing="-1">MG</text>
+  </g>
+</svg>
