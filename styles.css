@@ -882,6 +882,25 @@ summary:focus-visible {
 }
 .footer__bottom a { color: var(--ink-mute); }
 
+@media (max-width: 640px) {
+  .section { padding: var(--sp-7) 0; }
+  .section--tight { padding: var(--sp-6) 0; }
+  .hero { padding: var(--sp-8) 0 var(--sp-7); }
+  .trust { padding: var(--sp-5) 0; }
+  .section-head { margin-bottom: var(--sp-5); }
+  .hero__ctas { margin-bottom: var(--sp-6); }
+  .hero__meta { gap: var(--sp-4); padding-top: var(--sp-4); }
+  .grid,
+  .articles,
+  .faq,
+  .form,
+  .footer-grid { gap: var(--sp-4); }
+  .steps li { padding: var(--sp-4) 0; grid-template-columns: 56px 1fr; gap: var(--sp-3); }
+  .card,
+  .form,
+  .cta-band { padding: var(--sp-5); }
+}
+
 /* --- WhatsApp floating --- */
 .wa-float {
   position: fixed;
