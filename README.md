@@ -1,194 +1,176 @@
-# Sitio personal — Dr. Matías Luciano Godoy
+# Sitio personal - Dr. Matias Luciano Godoy
 
-Web personal profesional, enfocada en **fraude bancario digital**, **evidencia digital** y **defensa del consumidor financiero**. HTML/CSS/JS puro, sin frameworks. Lista para desplegarse en **Cloudflare Pages**.
+Sitio profesional orientado a fraude bancario digital, evidencia digital y defensa del consumidor financiero.
+Stack simple: HTML, CSS y JavaScript vanilla. Sin build, sin dependencias y listo para desplegar en Cloudflare Pages.
 
----
+## Estado actual
 
-## 1. Estrategia de posicionamiento
+- Repositorio publicado en GitHub.
+- Dominio objetivo: `matiasgodoy.com.ar`.
+- Deploy preparado para Cloudflare Pages.
+- SEO base ya apuntando a `https://matiasgodoy.com.ar/`.
+- Formulario funcionando con derivacion a WhatsApp aunque el backend de leads todavia no este configurado.
 
-**Idea central**: la web no presenta a Matías como abogado generalista. Lo presenta como un profesional con **doble formación** (jurídica + ciberseguridad) que entiende cómo ocurren los fraudes digitales y cómo construir el reclamo a partir de la evidencia disponible.
+## Estructura
 
-- **Diferenciación frente a TPG**: TPG es la firma institucional, amplia y de equipo. Esta web es personal y enfocada. La menciona en footer/contacto, no en hero.
-- **Promesa**: análisis legal-técnico de fraude bancario digital. Sin promesas de resultado.
-- **Voz**: sobria, jurídica, prudente, accesible. Verbos como *analizar, evaluar, ordenar, diseñar, acompañar*.
-- **Públicos**: víctimas de transferencias no autorizadas, vaciamiento de cuenta, compras desconocidas, fraudes en wallets/fintechs y empresas/profesionales que necesitan entender riesgos legales digitales.
-
-## 2. Arquitectura del sitio
-
-```
-/                                   → index.html (Home)
-/sobre-mi.html                      → Perfil profesional
-/fraude-bancario.html               → Landing principal de captación
-/evidencia-digital.html             → Guía práctica + autoridad
-/analisis.html                      → Hub de artículos
-/articulos/transferencia-no-autorizada.html
-/articulos/errores-comunes-reclamo.html
-/articulos/evidencia-digital-conservar.html
-/contacto.html                      → Formulario + WhatsApp + canales
-/404.html
-/sitemap.xml
-/robots.txt
-```
-
-Cada página comparte un **header sticky**, **footer** consistente, **botón flotante de WhatsApp** y SEO básico (title, description, canonical, Open Graph, Twitter, JSON-LD donde corresponde).
-
-## 3. Diseño visual
-
-Sistema en `styles.css` (tokens CSS):
-
-- **Paleta**: azul marino oscuro `#0a1628`, navy/grafito `#1a2438`, blanco `#fff`, fondo cálido neutro `#f7f8fa`, celeste tenue `#4d7eb3`, accent suave `#d8e4f1`.
-- **Tipografía**: *Cormorant Garamond* para titulares (peso editorial/jurídico), *Inter* para texto y UI.
-- **Componentes**: hero con grilla técnica sutil, cards con bordes finos, sección oscura de CTA, pasos numerados, prose para artículos, formulario tipado.
-- **Mobile-first**: layout columna única → grids de 2/3/4 según breakpoint.
-- **Accesibilidad**: skip-link, focos visibles, `aria-current`, animaciones desactivables vía `prefers-reduced-motion`.
-
-## 4. Implementación
-
-Stack: HTML5 + CSS (variables, Grid, Flexbox) + JS vanilla. Sin build, sin dependencias.
-
-Funcionalidades en `script.js`:
-
-- Menú móvil tipo drawer.
-- Año dinámico en footer.
-- Reveal on scroll con `IntersectionObserver`.
-- Generación de links de WhatsApp con `data-wa="…"`.
-- Envío del formulario:
-  1. POST a `LEADS_ENDPOINT` (Apps Script u otro endpoint) con `Content-Type: text/plain;charset=utf-8` para evitar preflight CORS.
-  2. **No bloquea** la consulta si el guardado falla.
-  3. Abre WhatsApp con un mensaje contextualizado a partir de los datos del formulario.
-
-## 5. Archivos creados
-
-```
-index.html
-sobre-mi.html
-fraude-bancario.html
-evidencia-digital.html
-analisis.html
-contacto.html
-articulos/transferencia-no-autorizada.html
-articulos/errores-comunes-reclamo.html
-articulos/evidencia-digital-conservar.html
-styles.css
-script.js
-sitemap.xml
-robots.txt
-404.html
-README.md
+```text
+/
+|- index.html
+|- sobre-mi.html
+|- fraude-bancario.html
+|- evidencia-digital.html
+|- analisis.html
+|- contacto.html
+|- 404.html
+|- styles.css
+|- script.js
+|- apps-script.gs
+|- robots.txt
+|- sitemap.xml
+|- _headers
+|- .nojekyll
+`- articulos/
+   |- transferencia-no-autorizada.html
+   |- creditos-no-solicitados.html
+   |- errores-comunes-reclamo.html
+   `- evidencia-digital-conservar.html
 ```
 
-## 6. Cómo correr localmente
+## Como correrlo localmente
 
-Cualquier servidor estático funciona. Tres opciones:
+Cualquier servidor estatico sirve.
 
 ```bash
-# Python 3
 python -m http.server 5173
-
-# Node (si tenés npx)
-npx serve -l 5173 .
-
-# VS Code: extensión "Live Server"
 ```
 
-Abrir `http://localhost:5173/`.
+Abrir:
 
-## 7. Conexión del formulario (opcional)
+```text
+http://localhost:5173/
+```
 
-El formulario está preparado para integrar **Google Sheets vía Apps Script** sin romper si todavía no hay backend:
+## Deploy
 
-1. Crear un Google Sheet (ej. `Leads — Sitio personal`).
-2. Extensiones → Apps Script → pegar:
+### Cloudflare Pages
 
-   ```js
-   function doPost(e) {
-     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-     const data = JSON.parse(e.postData.contents);
-     sheet.appendRow([
-       new Date(),
-       data.nombre || "",
-       data.telefono || "",
-       data.email || "",
-       data.tipo || "",
-       data.descripcion || "",
-       data.source || "",
-       data.userAgent || ""
-     ]);
-     return ContentService.createTextOutput(JSON.stringify({ ok: true }))
-       .setMimeType(ContentService.MimeType.JSON);
-   }
-   ```
+Configuracion recomendada:
 
-3. Implementar como Web App, ejecutándose como el dueño y con acceso "cualquiera".
-4. Copiar la URL generada y reemplazar en `script.js`:
+- Framework preset: `None`
+- Build command: vacio
+- Build output directory: `.`
+- Production branch: `main`
 
-   ```js
-   const LEADS_ENDPOINT = "https://script.google.com/macros/s/.../exec";
-   ```
+El repo ya incluye:
 
-Si no se completa este paso, el formulario sigue funcionando: deriva al usuario por WhatsApp con el contexto cargado.
+- [`.github/workflows/pages.yml`](C:/Users/USER/Documents/Paginapersonal/.github/workflows/pages.yml:1) para GitHub Pages
+- [`_headers`](C:/Users/USER/Documents/Paginapersonal/_headers:1) para headers y cache en Cloudflare Pages
+- [`.nojekyll`](C:/Users/USER/Documents/Paginapersonal/.nojekyll:1) para compatibilidad de hosting estatico
 
-## 8. Despliegue en Cloudflare Pages
+### Dominio
 
-1. Crear un repositorio Git con estos archivos (GitHub/GitLab) o subirlos directamente desde la UI de Pages.
-2. En Cloudflare → **Pages → Create project** → conectar el repo o "Direct Upload".
-3. **Build settings**: dejar vacíos (es un sitio estático). Output directory: `/`.
-4. Conectar el dominio personalizado en *Custom domains*.
+Objetivo final:
 
-Recomendaciones:
+- Canonico: `https://matiasgodoy.com.ar/`
+- Secundario: `https://www.matiasgodoy.com.ar/` redirigiendo al canonico
 
-- Activar HTTPS automático (default).
-- Activar *Always Use HTTPS* y *Brotli*.
-- Agregar un *redirect rule* `www → root` o viceversa según se elija.
+Recomendacion operativa:
 
-## 9. SEO incluido
+1. Esperar a que la zona DNS quede activa en Cloudflare.
+2. Agregar `matiasgodoy.com.ar` al proyecto `matias-godoy-web`.
+3. Agregar `www.matiasgodoy.com.ar`.
+4. Redirigir `www` al dominio raiz.
 
-- `title`, `meta description`, `canonical`, Open Graph, Twitter Card en cada página.
-- JSON-LD `Person` y `LegalService` en home; `Article` en cada artículo.
-- `sitemap.xml` y `robots.txt` listos.
-- Encabezados `h1/h2/h3` jerárquicos.
-- URLs limpias, en español, con palabras clave relevantes.
+## Formulario y leads
 
-Antes de publicar, reemplazar el dominio `matiasgodoy.com.ar` por el dominio definitivo en `sitemap.xml`, `robots.txt` y los `<link rel="canonical">` / `og:url`.
+### Como funciona hoy
 
-## 10. Recomendaciones de dominio
+El formulario:
 
-Opciones por orden de preferencia:
+- valida campos en frontend;
+- intenta guardar el lead en `LEADS_ENDPOINT`;
+- abre WhatsApp con mensaje contextual;
+- si el backend no existe o falla, no bloquea al usuario y deja seguir por WhatsApp.
 
-1. `matiasgodoy.com.ar` — claro, profesional, fácil de recordar.
-2. `drmatiasgodoy.com.ar` — refuerza el título profesional.
-3. `mgodoylegal.com.ar` — más corto y útil para email.
-4. `matiasgodoy.legal` — moderno (gTLD `.legal`), si se quiere proyección internacional.
+El valor actual en [script.js](C:/Users/USER/Documents/Paginapersonal/script.js:10) sigue siendo placeholder:
 
-Sugerencia: registrar dos (`.com.ar` + `.legal`) y redirigir uno al otro.
+```js
+const LEADS_ENDPOINT = "PEGAR_URL_DE_APPS_SCRIPT";
+```
 
-## 11. Próximos pasos
+Eso significa que hoy:
 
-**Corto plazo**
+- el contacto por WhatsApp funciona;
+- el lead remoto no se guarda todavia.
 
-- [ ] Reemplazar dominio placeholder en SEO (`matiasgodoy.com.ar`).
-- [ ] Configurar Google Sheets + Apps Script y pegar la URL en `script.js`.
-- [ ] Validar credenciales y formación que se quieran exponer en *Sobre mí* (sin inventar nada).
-- [ ] Foto profesional opcional para hero o página *Sobre mí*.
-- [ ] Crear OG image (1200x630) consistente con la paleta.
+### Para activarlo con Google Sheets + Apps Script
 
-**Mediano plazo**
+1. Crear una hoja nueva en Google Sheets.
+2. Abrir `Extensiones > Apps Script`.
+3. Pegar el contenido de [apps-script.gs](C:/Users/USER/Documents/Paginapersonal/apps-script.gs:1).
+4. Reemplazar en ese archivo:
+   - `SHEET_ID`
+   - `SHEET_NAME` si hace falta
+   - `NOTIFY_EMAIL` si queres aviso por mail
+5. Publicar como Web App:
+   - Ejecutar como: vos
+   - Acceso: cualquier usuario
+6. Copiar la URL terminada en `/exec`.
+7. Reemplazar `PEGAR_URL_DE_APPS_SCRIPT` en [script.js](C:/Users/USER/Documents/Paginapersonal/script.js:10).
 
-- [ ] Sumar 6–10 artículos más en `/articulos/` (jurisprudencia comentada, casos típicos, fintechs específicas).
-- [ ] Página de jurisprudencia/fallos comentados como categoría destacada.
-- [ ] FAQ en `/fraude-bancario.html` (montos típicos, plazos, qué esperar).
-- [ ] Aviso legal y política de privacidad como página separada.
+Ejemplo:
 
-**Largo plazo**
+```js
+const LEADS_ENDPOINT = "https://script.google.com/macros/s/XXXXXXXXXXXX/exec";
+```
 
-- [ ] Integrar analítica liviana (Plausible o Cloudflare Web Analytics).
-- [ ] Newsletter breve mensual para clientes y derivadores.
-- [ ] Mini CMS (Decap CMS o similar) si el volumen de artículos crece.
+## UX y mobile
 
-## 12. Criterio editorial — recordatorios
+El repo ya tiene:
 
-- No prometer resultados. No "garantizar" recuperos.
-- No inventar credenciales ni titulaciones.
-- No replicar contenido del sitio de Estudio Jurídico TPG.
-- Mantener un foco claro en fraude bancario digital y consumo financiero.
-- Cada CTA debe llevar a una acción concreta y manejable: consulta, lectura de guía, WhatsApp.
+- menu movil con drawer;
+- cierre por click externo y tecla Escape;
+- foco visible;
+- bloqueo de scroll de fondo con menu abierto;
+- validacion de formulario;
+- safe area para el boton flotante de WhatsApp;
+- layout responsive mobile-first.
+
+Igual conviene hacer una pasada manual en:
+
+- iPhone Safari
+- Android Chrome
+- tablet
+
+## SEO y contenido
+
+Ya incluidos:
+
+- `title`, `meta description`, `canonical`
+- Open Graph y Twitter Cards
+- `robots.txt`
+- `sitemap.xml`
+- JSON-LD
+
+Antes de darlo por cerrado conviene verificar:
+
+- dominio final activo en Cloudflare;
+- indexacion correcta del dominio canonico;
+- vista previa social de `og-image.png`.
+
+## Archivos clave
+
+- [index.html](C:/Users/USER/Documents/Paginapersonal/index.html:1): home y formulario principal
+- [contacto.html](C:/Users/USER/Documents/Paginapersonal/contacto.html:1): contacto dedicado
+- [styles.css](C:/Users/USER/Documents/Paginapersonal/styles.css:1): sistema visual y responsive
+- [script.js](C:/Users/USER/Documents/Paginapersonal/script.js:1): menu movil, WhatsApp y formulario
+- [apps-script.gs](C:/Users/USER/Documents/Paginapersonal/apps-script.gs:1): backend opcional de leads
+- [_headers](C:/Users/USER/Documents/Paginapersonal/_headers:1): headers para Cloudflare Pages
+
+## Pendientes recomendados
+
+- Configurar `LEADS_ENDPOINT`.
+- Activar el dominio final en Cloudflare Pages.
+- Revisar el sitio en celulares reales.
+- Sumar analytics si queres medir conversiones.
+- Opcional: pagina separada de privacidad/aviso legal.
