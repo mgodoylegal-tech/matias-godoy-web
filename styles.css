@@ -85,6 +85,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+body.no-scroll { overflow: hidden; }
 img, svg { max-width: 100%; height: auto; display: block; }
 a { color: var(--gold); text-decoration: none; transition: color var(--transition); }
 a:hover { color: var(--gold-soft); }
@@ -228,6 +229,17 @@ strong { color: var(--ink); font-weight: 600; }
   cursor: pointer;
   color: var(--ink);
 }
+.nav__toggle:focus-visible,
+.nav__mobile a:focus-visible,
+.btn:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
 .nav__toggle span,
 .nav__toggle span::before,
 .nav__toggle span::after {
@@ -259,6 +271,8 @@ strong { color: var(--ink); font-weight: 600; }
   display: none;
   border-top: 1px solid var(--line);
   padding: var(--sp-4) 0 var(--sp-5);
+  max-height: calc(100vh - 72px);
+  overflow-y: auto;
 }
 .nav__mobile.is-open { display: block; }
 .nav__mobile ul {
@@ -435,7 +449,10 @@ strong { color: var(--ink); font-weight: 600; }
   font-size: 0.95rem;
 }
 @media (min-width: 720px) {
-  .trust__grid { grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+  .trust__grid { grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+}
+@media (min-width: 1040px) {
+  .trust__grid { grid-template-columns: repeat(4, 1fr); }
 }
 
 /* --- Cards / Grids --- */
@@ -606,6 +623,12 @@ strong { color: var(--ink); font-weight: 600; }
 .form__row { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; }
 @media (min-width: 640px) { .form__row { grid-template-columns: 1fr 1fr; } }
 .field { display: flex; flex-direction: column; gap: var(--sp-2); }
+.field.is-invalid input,
+.field.is-invalid select,
+.field.is-invalid textarea {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(200, 85, 61, 0.12);
+}
 .field label {
   font-size: var(--fs-sm);
   font-weight: 500;
@@ -635,6 +658,11 @@ strong { color: var(--ink); font-weight: 600; }
 .field input::placeholder,
 .field textarea::placeholder { color: var(--ink-faint); }
 .field__hint { font-size: var(--fs-xs); color: var(--ink-mute); }
+.field__error {
+  min-height: 1.1rem;
+  font-size: var(--fs-xs);
+  color: var(--danger);
+}
 .field select option { background: var(--bg-alt); color: var(--ink); }
 
 .form__notice {
@@ -650,6 +678,10 @@ strong { color: var(--ink); font-weight: 600; }
 .form__status.is-visible { display: block; }
 .form__status--ok { color: var(--success); }
 .form__status--err { color: var(--danger); }
+.form__status a {
+  color: inherit;
+  text-decoration: underline;
+}
 
 /* --- Long-form content --- */
 .prose {
@@ -853,7 +885,8 @@ strong { color: var(--ink); font-weight: 600; }
 /* --- WhatsApp floating --- */
 .wa-float {
   position: fixed;
-  right: 18px; bottom: 18px;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: calc(18px + env(safe-area-inset-bottom));
   z-index: 60;
   background: #1f8a52;
   color: #fff;
@@ -865,6 +898,12 @@ strong { color: var(--ink); font-weight: 600; }
 }
 .wa-float:hover { transform: scale(1.05); background: #2aa564; color: #fff; }
 .wa-float svg { width: 26px; height: 26px; }
+@media (max-width: 640px) {
+  .wa-float {
+    width: 58px;
+    height: 58px;
+  }
+}
 
 /* --- Disclaimer --- */
 .disclaimer {

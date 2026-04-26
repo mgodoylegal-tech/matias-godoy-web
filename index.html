@@ -108,10 +108,10 @@
         </ul>
       </nav>
       <a href="#contacto" class="nav__cta">Consultar caso</a>
-      <button class="nav__toggle" aria-expanded="false" aria-controls="nav-mobile" aria-label="Abrir menú"><span></span></button>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="nav-mobile" aria-haspopup="true" aria-label="Abrir menú"><span></span></button>
     </div>
     <div class="container">
-      <div id="nav-mobile" class="nav__mobile">
+      <div id="nav-mobile" class="nav__mobile" aria-hidden="true">
         <ul>
           <li><a href="/">Inicio</a></li>
           <li><a href="#casos">Casos</a></li>
@@ -485,18 +485,18 @@
             <div class="form__row">
               <div class="field">
                 <label for="nombre">Nombre y apellido</label>
-                <input type="text" id="nombre" name="nombre" required autocomplete="name" />
+                <input type="text" id="nombre" name="nombre" required minlength="3" autocomplete="name" enterkeyhint="next" />
               </div>
               <div class="field">
                 <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" name="telefono" required autocomplete="tel" />
+                <input type="tel" id="telefono" name="telefono" required autocomplete="tel" inputmode="tel" enterkeyhint="next" />
               </div>
             </div>
 
             <div class="form__row">
               <div class="field">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required autocomplete="email" />
+                <input type="email" id="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next" />
               </div>
               <div class="field">
                 <label for="tipo">Tipo de caso</label>
@@ -516,7 +516,7 @@
 
             <div class="field">
               <label for="descripcion">Descripción breve</label>
-              <textarea id="descripcion" name="descripcion" required placeholder="Qué pasó, cuándo, en qué entidad y monto aproximado (sin datos sensibles)."></textarea>
+              <textarea id="descripcion" name="descripcion" required minlength="20" placeholder="Qué pasó, cuándo, en qué entidad y monto aproximado (sin datos sensibles)." enterkeyhint="send"></textarea>
               <span class="field__hint">Sin claves, tokens, contraseñas, PIN ni datos bancarios sensibles.</span>
             </div>
 
