@@ -977,48 +977,11 @@ summary:focus-visible {
 }
 .wa-float:hover { transform: scale(1.05); background: #2aa564; color: #fff; }
 .wa-float svg { width: 26px; height: 26px; }
-.mobile-cta { display: none; }
 @media (max-width: 640px) {
   .wa-float {
     width: 58px;
     height: 58px;
   }
-  .mobile-cta {
-    display: grid;
-    grid-template-columns: 1.7fr 1fr;
-    gap: var(--sp-3);
-    position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    z-index: 58;
-    padding: 0;
-  }
-  .mobile-cta__primary,
-  .mobile-cta__wa {
-    min-height: 52px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: var(--fs-sm);
-    box-shadow: 0 12px 28px -16px rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-  .mobile-cta__primary {
-    background: var(--gold);
-    color: #0a0a0a;
-  }
-  .mobile-cta__primary:hover { color: #0a0a0a; background: var(--gold-soft); }
-  .mobile-cta__wa {
-    background: rgba(31, 138, 82, 0.96);
-    color: #fff;
-  }
-  .mobile-cta__wa:hover { color: #fff; background: #2aa564; }
-  .page-home .wa-float { bottom: calc(76px + env(safe-area-inset-bottom)); }
-  .page-home .site-footer { padding-bottom: calc(var(--sp-8) + 84px); }
 }
 
 /* --- Disclaimer --- */
