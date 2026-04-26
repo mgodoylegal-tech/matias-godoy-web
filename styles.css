@@ -620,6 +620,20 @@ summary:focus-visible {
   border-radius: var(--radius-lg);
   padding: var(--sp-6);
 }
+.form--priority {
+  border-color: var(--gold-deep);
+  box-shadow: var(--shadow-gold);
+  position: relative;
+}
+.form--priority::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
 .form__row { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; }
 @media (min-width: 640px) { .form__row { grid-template-columns: 1fr 1fr; } }
 .field { display: flex; flex-direction: column; gap: var(--sp-2); }
@@ -673,6 +687,34 @@ summary:focus-visible {
   padding: var(--sp-3) var(--sp-4);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   line-height: 1.6;
+}
+.form__lead {
+  display: grid;
+  gap: var(--sp-2);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--line);
+}
+.form__lead h3 {
+  font-size: var(--fs-lg);
+  margin: 0;
+}
+.form__lead p {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+.form__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: var(--gold-tint);
+  color: var(--gold-soft);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 .form__status { font-size: var(--fs-sm); display: none; }
 .form__status.is-visible { display: block; }
@@ -915,6 +957,8 @@ summary:focus-visible {
   .page-home .card,
   .page-home .cta-band { padding: var(--sp-4); }
   .page-home .steps li { padding: var(--sp-3) 0; }
+  .form--priority { box-shadow: 0 10px 26px -12px rgba(201, 161, 74, 0.45); }
+  .form__lead h3 { font-size: var(--fs-md); }
 }
 
 /* --- WhatsApp floating --- */
