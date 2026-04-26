@@ -1030,3 +1030,19 @@ summary:focus-visible {
 .skip-link:focus { left: 8px; top: 8px; }
 .text-center { text-align: center; }
 .muted { color: var(--ink-mute); }
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  align-items: center;
+}
+@media (max-width: 640px) {
+  .action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .action-row .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
