@@ -1,20 +1,19 @@
 /* ================================================================
-   Dr. Matías Luciano Godoy — script.js
-   Menú móvil, formulario de leads, WhatsApp y reveal on scroll.
+   Dr. Matias Luciano Godoy - script.js
+   Menu movil, formulario de leads, WhatsApp y reveal on scroll.
    ================================================================ */
 
-// === Configuración ===========================================================
-// Endpoint de Apps Script / backend para guardar leads. Dejar como string vacío
-// o el placeholder para deshabilitar el guardado remoto.
-// Cuando esté listo el backend, reemplazar por la URL del Web App de Apps Script.
-const LEADS_ENDPOINT = "PEGAR_URL_DE_APPS_SCRIPT";
+// === Configuracion ==========================================================
+// Endpoint de Apps Script / backend para guardar leads.
+// Se puede definir en esta constante o en window.SITE_CONFIG.leadsEndpoint.
+const LEADS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwbkemUbUHwbkJhIU78sJcCuXIFaBy-JxQeZnZcp2rN3o9OP8fMN2jU2CUQLrn9gY3d2A/exec";
 
 // Datos de WhatsApp.
 const WHATSAPP_NUMBER = "5491155857623";
 const WHATSAPP_DEFAULT_MSG =
-  "Hola Matías, quiero hacer una consulta por un posible fraude bancario digital.";
+  "Hola Mat\u00edas, quiero hacer una consulta por un posible fraude bancario digital.";
 
-// === Utils ===================================================================
+// === Utils ==================================================================
 const qs = (sel, ctx = document) => ctx.querySelector(sel);
 const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
@@ -23,11 +22,17 @@ function buildWhatsAppUrl(message) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
 }
 
+function getLeadsEndpoint() {
+  const globalEndpoint = window.SITE_CONFIG?.leadsEndpoint;
+  const endpoint = globalEndpoint || LEADS_ENDPOINT;
+  return typeof endpoint === "string" ? endpoint.trim() : "";
+}
+
 function isFocusable(element) {
   return !element.hasAttribute("disabled") && !element.getAttribute("aria-hidden");
 }
 
-// === Menú móvil =============================================================
+// === Menu movil =============================================================
 function initMobileNav() {
   const toggle = qs(".nav__toggle");
   const drawer = qs(".nav__mobile");
@@ -65,7 +70,6 @@ function initMobileNav() {
     }
   });
 
-  // Cerrar al hacer click en un link interno
   qsa("a", drawer).forEach((a) =>
     a.addEventListener("click", () => {
       closeDrawer();
@@ -105,13 +109,13 @@ function initMobileNav() {
   });
 }
 
-// === Año footer ==============================================================
+// === Año footer =============================================================
 function initFooterYear() {
   const el = qs("[data-year]");
   if (el) el.textContent = String(new Date().getFullYear());
 }
 
-// === Reveal on scroll ========================================================
+// === Reveal on scroll =======================================================
 function initReveal() {
   const items = qsa(".reveal");
   if (!("IntersectionObserver" in window) || items.length === 0) {
@@ -132,7 +136,7 @@ function initReveal() {
   items.forEach((el) => io.observe(el));
 }
 
-// === WhatsApp links ==========================================================
+// === WhatsApp links =========================================================
 function initWhatsAppLinks() {
   qsa("[data-wa]").forEach((el) => {
     const message = el.getAttribute("data-wa") || WHATSAPP_DEFAULT_MSG;
@@ -142,7 +146,7 @@ function initWhatsAppLinks() {
   });
 }
 
-// === Formulario de contacto =================================================
+// === Formulario de contacto ================================================
 function initContactForm() {
   const form = qs("#contact-form");
   if (!form) return;
@@ -161,9 +165,9 @@ function initContactForm() {
   function getFieldErrorMessage(field) {
     if (field.validity.customError) return "Este campo es obligatorio.";
     if (field.validity.valueMissing) return "Este campo es obligatorio.";
-    if (field.validity.typeMismatch && field.type === "email") return "Ingresá un email válido.";
-    if (field.validity.tooShort) return "Completá este campo con más información.";
-    return "Revisá este campo.";
+    if (field.validity.typeMismatch && field.type === "email") return "Ingres\u00e1 un email v\u00e1lido.";
+    if (field.validity.tooShort) return "Complet\u00e1 este campo con m\u00e1s informaci\u00f3n.";
+    return "Revis\u00e1 este campo.";
   }
 
   function ensureErrorElement(field) {
@@ -221,7 +225,7 @@ function initContactForm() {
     const invalidFields = validateForm();
 
     if (invalidFields.length > 0) {
-      showStatus("err", "Revisá los campos marcados antes de enviar la consulta.");
+      showStatus("err", "Revis\u00e1 los campos marcados antes de enviar la consulta.");
       invalidFields[0].focus();
       return;
     }
@@ -229,7 +233,7 @@ function initContactForm() {
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.dataset.originalText = submitBtn.textContent;
-      submitBtn.textContent = "Preparando WhatsApp…";
+      submitBtn.textContent = "Preparando WhatsApp...";
     }
 
     const data = Object.fromEntries(
@@ -242,30 +246,34 @@ function initContactForm() {
     data.timestamp = new Date().toISOString();
     data.userAgent = navigator.userAgent;
 
-    // Construir mensaje de WhatsApp con el contexto del formulario
     const waMessage =
-      `Hola Matías, soy ${data.nombre || "(sin nombre)"}. ` +
-      `Quería consultarte por: ${data.tipo || "consulta general"}. ` +
+      `Hola Mat\u00edas, soy ${data.nombre || "(sin nombre)"}. ` +
+      `Quer\u00eda consultarte por: ${data.tipo || "consulta general"}. ` +
       (data.descripcion ? `Detalle: ${data.descripcion}` : "");
 
     const waUrl = buildWhatsAppUrl(waMessage);
     const popup = window.open(waUrl, "_blank", "noopener");
     const remoteOk = await saveLead(data);
     const popupBlocked = !popup || popup.closed || typeof popup.closed === "undefined";
+    const endpointConfigured = Boolean(getLeadsEndpoint()) && getLeadsEndpoint() !== "PEGAR_URL_DE_APPS_SCRIPT";
 
     if (remoteOk) {
       showStatus(
         "ok",
         popupBlocked
-          ? `Recibimos tu consulta. Si WhatsApp no se abrió, seguí desde <a href="${waUrl}" target="_blank" rel="noopener">este enlace directo</a>.`
-          : "Recibimos tu consulta. También abrimos WhatsApp para continuar más rápido."
+          ? `Recibimos tu consulta. Si WhatsApp no se abri\u00f3, segu\u00ed desde <a href="${waUrl}" target="_blank" rel="noopener">este enlace directo</a>.`
+          : "Recibimos tu consulta. Tambi\u00e9n abrimos WhatsApp para continuar m\u00e1s r\u00e1pido."
       );
     } else {
       showStatus(
         "err",
-        popupBlocked
-          ? `No pudimos registrar la consulta en este momento. Para no frenarte, seguí por <a href="${waUrl}" target="_blank" rel="noopener">WhatsApp</a>.`
-          : "No pudimos registrar la consulta en este momento, pero ya abrimos WhatsApp para continuar sin perder tiempo."
+        !endpointConfigured
+          ? popupBlocked
+            ? `El formulario todav\u00eda no est\u00e1 sincronizado con un backend de leads. Para no frenarte, segu\u00ed por <a href="${waUrl}" target="_blank" rel="noopener">WhatsApp</a>.`
+            : "El formulario todav\u00eda no est\u00e1 sincronizado con un backend de leads, pero ya abrimos WhatsApp para continuar sin perder tiempo."
+          : popupBlocked
+            ? `No pudimos registrar la consulta en este momento. Para no frenarte, segu\u00ed por <a href="${waUrl}" target="_blank" rel="noopener">WhatsApp</a>.`
+            : "No pudimos registrar la consulta en este momento, pero ya abrimos WhatsApp para continuar sin perder tiempo."
       );
     }
 
@@ -282,18 +290,19 @@ function initContactForm() {
 }
 
 async function saveLead(payload) {
-  // Si no hay endpoint configurado, no rompemos: devolvemos false silenciosamente.
+  const endpoint = getLeadsEndpoint();
+
   if (
-    !LEADS_ENDPOINT ||
-    LEADS_ENDPOINT === "PEGAR_URL_DE_APPS_SCRIPT" ||
-    !/^https?:\/\//i.test(LEADS_ENDPOINT)
+    !endpoint ||
+    endpoint === "PEGAR_URL_DE_APPS_SCRIPT" ||
+    !/^https?:\/\//i.test(endpoint)
   ) {
     return false;
   }
+
   try {
-    const res = await fetch(LEADS_ENDPOINT, {
+    const res = await fetch(endpoint, {
       method: "POST",
-      // Evitamos preflight CORS usando text/plain — Apps Script lo recibe en e.postData.contents
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload),
     });
@@ -304,7 +313,7 @@ async function saveLead(payload) {
   }
 }
 
-// === Init ====================================================================
+// === Init ===================================================================
 document.addEventListener("DOMContentLoaded", () => {
   initMobileNav();
   initFooterYear();
