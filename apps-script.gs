@@ -1,83 +1,81 @@
 /**
  * ============================================================================
- * Dr. Matías Luciano Godoy — Backend de leads (Google Apps Script)
+ * Dr. Matias Luciano Godoy - Backend de leads (Google Apps Script)
  * ============================================================================
  *
- * Cómo desplegarlo (paso a paso):
+ * Este backend esta pensado para la planilla operativa del sitio, con columnas:
  *
- *  1. Crear una hoja de cálculo nueva en Google Sheets ("Leads — sitio Matías").
- *     En la primera fila poner los encabezados, en este orden exacto:
+ * lead_id | fecha_hora | nombre | telefono | email | tipo_consulta | mensaje |
+ * numero_whatsapp_asignado | origen | estado | pagina_origen | user_agent |
+ * prioridad | fecha_contacto | observaciones | resultado
  *
- *     timestamp | nombre | telefono | email | tipo | descripcion | userAgent | source
- *
- *  2. En esa hoja: Extensiones → Apps Script. Borrar el contenido y pegar
- *     todo este archivo (apps-script.gs).
- *
- *  3. En la línea SHEET_ID de abajo, pegar el ID de la hoja (lo que aparece
- *     en la URL de Sheets, entre /d/ y /edit).
- *
- *  4. Guardar (icono de disquete). Nombre del proyecto: "leads-matiasgodoy".
- *
- *  5. Implementar → Nueva implementación → Tipo: Aplicación web.
- *     - Ejecutar como: yo (tu cuenta).
- *     - Quién tiene acceso: cualquier usuario.
- *     - Implementar.
- *     - Copiar la URL de la app web (termina en /exec).
- *
- *  6. En script.js del sitio, reemplazar PEGAR_URL_DE_APPS_SCRIPT por esa URL.
- *
- *  7. Probar enviando una consulta desde el sitio: debería aparecer una fila
- *     nueva en la planilla.
- *
- * Notas:
- * - El sitio envía JSON como text/plain para evitar el preflight CORS.
- * - El backend nunca devuelve datos del usuario; sólo confirma OK / error.
- * - Si querés recibir aviso por email cuando entra una consulta, descomentá
- *   la línea de MailApp.sendEmail más abajo y pegar el destinatario.
+ * Pasos:
+ * 1. Abrir la Google Sheet de leads.
+ * 2. Extensiones > Apps Script.
+ * 3. Reemplazar el contenido por este archivo.
+ * 4. Ajustar SHEET_ID, ASSIGNED_WHATSAPP_NUMBER y NOTIFY_EMAIL si hace falta.
+ * 5. Implementar como Aplicacion web con acceso "Cualquiera".
  * ============================================================================
  */
 
-const SHEET_ID = "PEGAR_ID_DE_GOOGLE_SHEETS";
-const SHEET_NAME = "Sheet1"; // o "Hoja 1" según idioma de la cuenta
-const NOTIFY_EMAIL = ""; // opcional: dejar vacío o poner un mail para notificación
+const SHEET_ID = "1_x899PCWrn7KcedOERkSQVBeuV7SgbX0Ahk4RJdLIXc";
+const SHEET_NAME = ""; // dejar vacio para usar la primera hoja
+const TIMEZONE = "America/Argentina/Buenos_Aires";
+const ASSIGNED_WHATSAPP_NUMBER = "5491155857623";
+const NOTIFY_EMAIL = ""; // opcional
 
 function doPost(e) {
   try {
-    const payload = JSON.parse(e.postData.contents || "{}");
+    const payload = JSON.parse((e && e.postData && e.postData.contents) || "{}");
 
     const ss = SpreadsheetApp.openById(SHEET_ID);
-    const sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0];
+    const sheet = SHEET_NAME ? ss.getSheetByName(SHEET_NAME) : ss.getSheets()[0];
 
+    if (!sheet) {
+      throw new Error("No se encontro la hoja de destino.");
+    }
+
+    const leadId = Utilities.getUuid();
+    const createdAt = payload.timestamp ? new Date(payload.timestamp) : new Date();
+    const fechaHora = formatLocalDateTime(createdAt);
+    const prioridad = resolvePriority(payload.tipo || "", payload.descripcion || "");
+    const paginaOrigen = normalizePageOrigin(payload.pageOrigin || payload.page_origin || "");
+
+    const targetRow = sheet.getLastRow() + 1;
     sheet.appendRow([
-      payload.timestamp || new Date().toISOString(),
+      leadId,
+      fechaHora,
       payload.nombre || "",
       payload.telefono || "",
       payload.email || "",
       payload.tipo || "",
       payload.descripcion || "",
+      ASSIGNED_WHATSAPP_NUMBER,
+      payload.source || "sitio-personal",
+      "Nuevo",
+      paginaOrigen,
       payload.userAgent || "",
-      payload.source || "",
+      prioridad,
+      "",
+      "",
+      "Pendiente",
     ]);
 
+    styleNewLeadRow(sheet, targetRow, prioridad);
+
     if (NOTIFY_EMAIL) {
-      const subject = `Nueva consulta del sitio — ${payload.tipo || "general"}`;
-      const body =
-        `Nombre: ${payload.nombre || ""}\n` +
-        `Teléfono: ${payload.telefono || ""}\n` +
-        `Email: ${payload.email || ""}\n` +
-        `Tipo: ${payload.tipo || ""}\n` +
-        `Descripción: ${payload.descripcion || ""}\n\n` +
-        `Timestamp: ${payload.timestamp || ""}`;
-      MailApp.sendEmail(NOTIFY_EMAIL, subject, body);
+      MailApp.sendEmail(NOTIFY_EMAIL, buildSubject(payload.tipo || "", prioridad), buildEmailBody({
+        leadId,
+        fechaHora,
+        prioridad,
+        paginaOrigen,
+        payload,
+      }));
     }
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ ok: true, leadId, prioridad });
   } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ ok: false, error: String(err) });
   }
 }
 
@@ -85,4 +83,82 @@ function doGet() {
   return ContentService
     .createTextOutput("Endpoint operativo.")
     .setMimeType(ContentService.MimeType.TEXT);
+}
+
+function resolvePriority(tipo, descripcion) {
+  const haystack = `${tipo} ${descripcion}`.toLowerCase();
+
+  if (
+    haystack.includes("adulto mayor") ||
+    haystack.includes("cuenta vaciada") ||
+    haystack.includes("transferencia no autorizada") ||
+    haystack.includes("credito") ||
+    haystack.includes("crédito") ||
+    haystack.includes("prestamo no solicitado") ||
+    haystack.includes("préstamo no solicitado")
+  ) {
+    return "Alta";
+  }
+
+  if (
+    haystack.includes("fintech") ||
+    haystack.includes("billetera") ||
+    haystack.includes("reclamo rechazado") ||
+    haystack.includes("compra desconocida")
+  ) {
+    return "Media";
+  }
+
+  return "Baja";
+}
+
+function normalizePageOrigin(pageOrigin) {
+  if (!pageOrigin) return "";
+
+  try {
+    const url = new URL(pageOrigin);
+    return `${url.origin}${url.pathname}`;
+  } catch (err) {
+    return String(pageOrigin);
+  }
+}
+
+function formatLocalDateTime(date) {
+  return Utilities.formatDate(date, TIMEZONE, "yyyy-MM-dd HH:mm:ss");
+}
+
+function styleNewLeadRow(sheet, rowNumber, prioridad) {
+  const rowRange = sheet.getRange(rowNumber, 1, 1, 16);
+  const background = prioridad === "Alta" ? "#fce8e6" : prioridad === "Media" ? "#fff4cc" : "#e6f4ea";
+  rowRange.setBackground(background);
+
+  sheet.getRange(rowNumber, 2).setNumberFormat("yyyy-mm-dd hh:mm:ss");
+  sheet.getRange(rowNumber, 10).setFontWeight("bold");
+  sheet.getRange(rowNumber, 13).setFontWeight("bold");
+}
+
+function buildSubject(tipo, prioridad) {
+  const label = tipo || "consulta general";
+  return `Nuevo lead web - ${label} - Prioridad ${prioridad}`;
+}
+
+function buildEmailBody(context) {
+  return (
+    `Lead ID: ${context.leadId}\n` +
+    `Fecha: ${context.fechaHora}\n` +
+    `Prioridad: ${context.prioridad}\n` +
+    `Nombre: ${context.payload.nombre || ""}\n` +
+    `Telefono: ${context.payload.telefono || ""}\n` +
+    `Email: ${context.payload.email || ""}\n` +
+    `Tipo: ${context.payload.tipo || ""}\n` +
+    `Mensaje: ${context.payload.descripcion || ""}\n` +
+    `Pagina: ${context.paginaOrigen || ""}\n` +
+    `Origen: ${context.payload.source || ""}`
+  );
+}
+
+function jsonResponse(payload) {
+  return ContentService
+    .createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
 }

@@ -245,6 +245,7 @@ function initContactForm() {
     data.source = "sitio-personal";
     data.timestamp = new Date().toISOString();
     data.userAgent = navigator.userAgent;
+    data.pageOrigin = window.location.href;
 
     const waMessage =
       `Hola Mat\u00edas, soy ${data.nombre || "(sin nombre)"}. ` +
